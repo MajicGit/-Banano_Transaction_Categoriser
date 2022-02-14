@@ -122,13 +122,15 @@ def stagefour():
             writer = csv.writer(output,delimiter=",")
             for row in reader:
                 if row[0] == "hash":
-                    row.append("local_time")
+                    row.append("Date")
+                    row.append("Local Time")
                     writer.writerow(row)
                 else:
                     timestamp = row[9]
                     realtime = datetime.fromtimestamp(int(timestamp))
                     if realtime.year == 2021:
-                        row.append(realtime.strftime("%Y-%m-%d %H:%M:%S.%f"))
+                        row.append(realtime.strftime("%Y-%m-%d"))
+                        row.append(realtime.strftime("%H:%M:%S.%f"))
                         writer.writerow(row)
 
 
