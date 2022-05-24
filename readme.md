@@ -21,4 +21,5 @@ Potential future plans:
 - Categorise outgoing transactions better. E.g. get a list of all JungleTv fund wallets so you can have a good overview of that as well
 - Tidying up the files it creates (it currently creates around 8 different CSV files -- this is kinda needed in case it crashes so that you don't loose all your progress) but hopefully I'll be able to find a better solution 
 - Do further testing to actually verify the results, with more currencies
-- Build out the list of known addresses -- any report on ones the script is missing are very welcome.
+- Build out the list of known addresses -- any report on ones the script is missing are very welcome. Could also use Kirbys list for this. 
+- Speed up querying. Add some caching etcetera
