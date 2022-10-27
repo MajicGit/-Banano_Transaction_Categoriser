@@ -30,12 +30,23 @@ exchange_addresses = {"ban_1ddaz5y8jk47hkicpi1kc38kg359r74y38gmmq6moiki11gx1g4a9
 other_addr={"ban_3imophzbk9ruq3ju18jyw37376h3wdeon15asw4yj3kfgxs6m1eg7784a4im":"tipcc","ban_3po1yhotz68w6mogy6budr7g8y7gw5wjqhbgc5gt549emeoof9npf315xmn4":"poly wban","ban_1wbanktxc5mtnydsjq6doy81wsnn7fw1z7yzw4zzieb6dfkihjtbwzgrxt9i":"wban bsc"}
 
 
+def try_request(request,data={},is_post=False,backoff = 0):
+    try:
+        if is_post:
+            r = requests.post(request,json=data,timeout=4.2)
+        else:
+            r = requests.get(request,json=data,timeout=4.2)
+        return r 
+    except:
+        time.sleep(6.9 + 9.1 * backoff)
+        return try_request(request,data,is_post,backoff + 1)
+
 
 #1. Download account export from yellowspyglass -> account_export.csv
 def stageone():
     print("Stage one: Downloading account export from yellowspyglass, and saving it in account_export.csv")
     with open("account_export.csv",'wb') as export:
-        r = requests.post('https://api.spyglass.pw/banano/v1/account/export',json={"address":address})
+        r = try_request('https://api.spyglass.pw/banano/v1/account/export',{"address":address.rstrip()},True)
         export.write(r.content)
 
 #2. For each receive: Query corresponding send dates  
@@ -61,11 +72,11 @@ def stagetwo():
                     row.append("send_timestamp")
                 else:
                     if row[2] == "receive" and (not skip_exact): 
-                        blockhash = row[0]
-                        r = requests.get('https://api.spyglass.pw/banano/v1/block/'+blockhash)
+                        blockhash = row[0]                        
+                        r = try_request('https://api.spyglass.pw/banano/v1/block/'+blockhash)
                         block = json.loads(r.content)
                         sendhash = block['contents']['link']
-                        r = requests.get('https://api.spyglass.pw/banano/v1/block/'+sendhash)
+                        r = try_request('https://api.spyglass.pw/banano/v1/block/'+sendhash)
                         sendblock = json.loads(r.content)
                         row.append(sendblock['timestamp'])
                         time.sleep(12)
@@ -97,7 +108,7 @@ def stagethree():
                             try:
                                 #/coins/{id}/market_chart/range
                                 #data = cg.get_coin_market_chart_range_by_id(id='banano',vs_currency=desired_currency,from_timestamp=timestamp,to_timestamp=int(timestamp)+5000*(i+1))
-                                data = requests.get('https://api.coingecko.com/api/v3/coins/banano/market_chart/range?vs_currency='+desired_currency+'&from='+str(timestamp)+'&to='+str(int(timestamp)+5000*(i+1))).json()
+                                data = try_request('https://api.coingecko.com/api/v3/coins/banano/market_chart/range?vs_currency='+desired_currency+'&from='+str(timestamp)+'&to='+str(int(timestamp)+5000*(i+1))).json()
                                 price = data['prices'][0][1]
                                 break   
                             except IndexError:
