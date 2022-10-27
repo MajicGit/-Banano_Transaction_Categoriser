@@ -104,19 +104,24 @@ def stagethree():
                 else:
                     if row[2] != "change": 
                         timestamp = row[9]
-                        for i in range(0,5): #retry with growing intervals in case coingecko is being weird.
+                        for i in range(0,7): #retry with growing intervals in case coingecko is being weird.
                             try:
                                 #/coins/{id}/market_chart/range
                                 #data = cg.get_coin_market_chart_range_by_id(id='banano',vs_currency=desired_currency,from_timestamp=timestamp,to_timestamp=int(timestamp)+5000*(i+1))
                                 data = try_request('https://api.coingecko.com/api/v3/coins/banano/market_chart/range?vs_currency='+desired_currency+'&from='+str(timestamp)+'&to='+str(int(timestamp)+5000*(i+1))).json()
                                 price = data['prices'][0][1]
                                 break   
-                            except IndexError:
+                            except IndexError :
                                 print(i) 
                                 print("Query to coingecko failed, retrying")
-                                if i == 4:
+                                if i == 6:
                                     print("Unable to determine price for transaction with hash " + row[0] + ". Please manually fetch this data")
                                 continue
+                            except Exception as e:
+                                if i == 6:
+                                    print("Unable to determine price for transaction with hash " + row[0] + ". Please manually fetch this data")
+                                time.sleep(5)
+                                continue 
                         row.append(price)
                         row.append(price*float(row[8]))
                         time.sleep(1.25)
