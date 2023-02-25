@@ -104,7 +104,7 @@ def stagethree():
                 else:
                     if row[2] != "change": 
                         timestamp = row[9]
-                        for i in range(0,7): #retry with growing intervals in case coingecko is being weird.
+                        for i in range(0,30): #retry with growing intervals in case coingecko is being weird.
                             try:
                                 #/coins/{id}/market_chart/range
                                 #data = cg.get_coin_market_chart_range_by_id(id='banano',vs_currency=desired_currency,from_timestamp=timestamp,to_timestamp=int(timestamp)+5000*(i+1))
@@ -114,13 +114,14 @@ def stagethree():
                             except IndexError :
                                 print(i) 
                                 print("Query to coingecko failed, retrying")
-                                if i == 6:
+                                if i == 29:
                                     print("Unable to determine price for transaction with hash " + row[0] + ". Please manually fetch this data")
+                                time.sleep(4.2+i*0.19)
                                 continue
                             except Exception as e:
-                                if i == 6:
+                                if i == 29:
                                     print("Unable to determine price for transaction with hash " + row[0] + ". Please manually fetch this data")
-                                time.sleep(5)
+                                time.sleep(5.0+i*0.19)
                                 continue 
                         row.append(price)
                         row.append(price*float(row[8]))
@@ -142,7 +143,7 @@ def stagefour():
                 else:
                     timestamp = row[9]
                     realtime = datetime.fromtimestamp(int(timestamp))
-                    if realtime.year == 2021:
+                    if realtime.year == 2022:
                         row.append(realtime.strftime("%Y-%m-%d"))
                         row.append(realtime.strftime("%H:%M:%S.%f"))
                         writer.writerow(row)
